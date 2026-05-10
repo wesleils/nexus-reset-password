@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus — Redefinir Senha</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A0A0A;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .logo span { color: #CC0000; }
+    .subtitle {
+      font-size: 13px;
+      color: #CC0000;
+      letter-spacing: 4px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: #161616;
+      border: 1px solid #222;
+      border-radius: 20px;
+      padding: 32px 24px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #CC0000;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    input {
+      width: 100%;
+      background: #0A0A0A;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 16px;
+      color: #fff;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    input:focus { border-color: #CC0000; }
+    button {
+      width: 100%;
+      background: #CC0000;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    button:hover { background: #E53935; }
+    .msg {
+      font-size: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      display: none;
+    }
+    .msg.sucesso { background: #4CAF5020; border: 1px solid #4CAF50; color: #4CAF50; }
+    .msg.erro { background: #CC000020; border: 1px solid #CC0000; color: #CC0000; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">NEX<span>U</span>S</div>
+    <div class="subtitle">CONTROLE FINANCEIRO</div>
+
+    <div class="card">
+      <h1>Redefinir Senha</h1>
+      <p>Digite sua nova senha abaixo para recuperar o acesso à sua conta.</p>
+
+      <label>NOVA SENHA</label>
+      <input type="password" id="senha" placeholder="Mínimo 6 caracteres" />
+
+      <label>CONFIRMAR SENHA</label>
+      <input type="password" id="confirmar" placeholder="Digite novamente" />
+
+      <button onclick="redefinir()">REDEFINIR SENHA</button>
+
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://jzyaspiyvdogtzetssuo.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eWFzcGl5dmRvZ3R6ZXRzc3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMzMwMjEsImV4cCI6MjA5MzkwOTAyMX0.Zmevbya1y2YccvFY247l2-dyeeoSk-Oh4qi_rOxIhhw'
+    );
+
+    async function redefinir() {
+      const senha = document.getElementById('senha').value;
+      const confirmar = document.getElementById('confirmar').value;
+      const msg = document.getElementById('msg');
+
+      if (!senha || senha.length < 6) {
+        msg.className = 'msg erro';
+        msg.style.display = 'block';
+        msg.textContent = 'A senha precisa ter pelo menos 6 caracteres!';
+        return;
+      }
+
+      if (senha !== confirmar) {
+        msg.className = 'msg erro';
+        msg.style.display = 'block';
+        msg.textContent = 'As senhas não coincidem!';
+        return;
+      }
+
+      const { error } = await sb.auth.updateUser({ password: senha });
+
+      if (error) {
+        msg.className = 'msg erro';
+        msg.style.display = 'block';
+        msg.textContent = 'Erro: ' + error.message;
+      } else {
+        msg.className = 'msg sucesso';
+        msg.style.display = 'block';
+        msg.textContent = '✅ Senha redefinida com sucesso! Você já pode fazer login no app.';
+      }
+    }
+  </script>
+</body>
+</html>
